@@ -22,7 +22,8 @@ impl<'a> Node<'a> {
     }
 
     fn insert(&self, bits: Rc<Bits>, text: Rc<&'a str>) {
-        todo!()
+        
+     todo!();
     }
 }
 
