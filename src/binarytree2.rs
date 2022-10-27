@@ -25,10 +25,10 @@ impl<'a> Node<'a> {
         if self.text == text {
             return;
         }
-        let target = if text < self.text {
-            &self.left
+        let mut target = if text < self.text {
+            self.left.clone()
         } else {
-            &self.right
+            self.right.clone()
         };
         match target {
             Some(subnode) => subnode.insert(bits, text),
