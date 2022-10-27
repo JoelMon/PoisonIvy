@@ -22,8 +22,28 @@ impl<'a> Node<'a> {
     }
 
     fn insert(&self, bits: Rc<Bits>, text: Rc<&'a str>) {
-        
-     todo!();
+        if self.text == text {
+            return;
+        }
+        let target = if text < self.text {
+            &self.left
+        } else {
+            &self.right
+        };
+        match target {
+            Some(subnode) => subnode.insert(bits, text),
+            None => {
+                let new_node = Node {
+                    bits,
+                    text,
+                    left: None,
+                    right: None,
+                };
+                let wrapped = Some(new_node);
+
+                *target = wrapped;
+            }
+        }
     }
 }
 
