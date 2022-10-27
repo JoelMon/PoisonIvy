@@ -11,6 +11,7 @@ struct Node<'a> {
     right: Option<Rc<Node<'a>>>,
 }
 
+// Implementation for a leaf node.
 impl<'a> Node<'a> {
     fn new() -> Self {
         Self {
@@ -20,19 +21,19 @@ impl<'a> Node<'a> {
             right: None,
         }
     }
-
-    fn insert(&self, bits: Rc<Bits>, text: Rc<&'a str>) {
+    // Inserts a new leaf node in the correct branch
+    fn insert(&mut self, bits: Rc<Bits>, text: Rc<&'a str>) {
         if self.text == text {
             return;
         }
-        let mut target = if text < self.text {
-            self.left.clone()
+        let target = if text < self.text {
+            &mut self.left
         } else {
-            self.right.clone()
+            &mut self.right
         };
         match target {
-            Some(subnode) => subnode.insert(bits, text),
-            None => {
+            &mut Some(ref mut subnode) => subnode.insert(bits, text),
+            &mut None => {
                 let new_node = Node {
                     bits,
                     text,
@@ -40,8 +41,7 @@ impl<'a> Node<'a> {
                     right: None,
                 };
                 let wrapped = Some(Rc::new(new_node));
-
-                target = wrapped;
+                *target = wrapped;
             }
         }
     }
