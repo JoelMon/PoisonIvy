@@ -39,9 +39,9 @@ impl<'a> Node<'a> {
                     left: None,
                     right: None,
                 };
-                let wrapped = Some(new_node);
+                let wrapped = Some(Rc::new(new_node));
 
-                *target = wrapped;
+                target = wrapped;
             }
         }
     }
