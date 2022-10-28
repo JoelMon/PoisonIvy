@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::ops::Deref;
 use std::rc::Rc;
 
 type Bits = Vec<bool>;
@@ -22,19 +23,20 @@ impl<'a> Node<'a> {
         }
     }
     // Inserts a new leaf node in the correct branch
-    fn insert(&self, bits: Rc<Bits>, text: Rc<&'a str>) {
+    fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>)  {
         if self.text == text {
             return;
         }
 
         let mut target = if text < self.text {
-            &self.left
+            self.left
         } else {
-            &self.right
+            self.right
         };
 
         match target {
-            Some(subnode) => subnode.insert(bits, text),
+            Some(subnode) => subnode.insert(bits, text)
+            ,
             None => {
                 let new_node = Rc::new(Node {
                     bits,
@@ -43,9 +45,10 @@ impl<'a> Node<'a> {
                     right: None,
                 });
                 let wrapped = Some(new_node);
-                target = &wrapped;
+                target = wrapped;
             }
         }
+        todo!()
     }
 }
 
