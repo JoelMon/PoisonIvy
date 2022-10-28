@@ -38,7 +38,8 @@ impl<'a> WaxyNode<'a> {
 
         // FIX: Move out of an Rc error: https://stackoverflow.com/questions/72498867/cannot-move-out-of-an-rc-error-while-making-a-singly-linked-stack
         let mut branch: Option<WaxyNode> = if text < self.node.as_ref().into_inner().text {
-            self.node.as_ref().into_inner().left //can't consume RefCell, you have to return it!
+
+            let leg = self.node.as_ptr().left;
         } else {
             self.node.as_ref().into_inner().right //can't consume RefCell, you have to return it!
 
