@@ -8,8 +8,8 @@ type Bits = Vec<bool>;
 struct Node<'a> {
     bits: Rc<Bits>,
     text: Rc<&'a str>,
-    left: Option<WaxyNode<Node<'a>>>,
-    right: Option<WaxyNode<Node<'a>>>,
+    left: Option<WaxyNode<'a>>,
+    right: Option<WaxyNode<'a>>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
