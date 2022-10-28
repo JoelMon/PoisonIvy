@@ -22,26 +22,28 @@ impl<'a> Node<'a> {
         }
     }
     // Inserts a new leaf node in the correct branch
-    fn insert(&mut self, bits: Rc<Bits>, text: Rc<&'a str>) {
+    fn insert(&self, bits: Rc<Bits>, text: Rc<&'a str>) {
         if self.text == text {
             return;
         }
-        let target = if text < self.text {
-            &mut self.left
+
+        let mut target = if text < self.text {
+            &self.left
         } else {
-            &mut self.right
+            &self.right
         };
+
         match target {
-            &mut Some(ref mut subnode) => subnode.insert(bits, text),
-            &mut None => {
-                let new_node = Node {
+            Some(subnode) => subnode.insert(bits, text),
+            None => {
+                let new_node = Rc::new(Node {
                     bits,
                     text,
                     left: None,
                     right: None,
-                };
-                let wrapped = Some(Rc::new(new_node));
-                *target = wrapped;
+                });
+                let wrapped = Some(new_node);
+                target = &wrapped;
             }
         }
     }
@@ -60,7 +62,23 @@ mod test {
             left: None,
             right: None,
         };
-
         assert_eq!(got, expect);
+
+        #[test]
+        fn t_1_node() {
+            let got = Node::new().insert(vec![true].into(), "wow".into());
+            let expected= Node {
+                bits: Rc::new(vec![]),
+                text: Rc::new(""),
+                left: None,
+                right: Some(Rc::new(Node {
+                    bits: Rc::new(vec![true]),
+                    text: Rc::new("wow"),
+                    left: None,
+                    right: None,
+                })),
+            };
+            assert_eq!(got, expected);
+        }
     }
 }
