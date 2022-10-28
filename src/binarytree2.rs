@@ -29,11 +29,12 @@ impl<'a> WaxyNode<'a> {
         }
     }
     // Inserts a new leaf node in the correct branch
-    fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) {
+    fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>)  {
         if self.node.text == text {
             return;
         }
 
+        // FIX: Move out of an Rc error: https://stackoverflow.com/questions/72498867/cannot-move-out-of-an-rc-error-while-making-a-singly-linked-stack
         let mut target = if text < self.node.text {
             self.node.left
         } else {
@@ -49,6 +50,7 @@ impl<'a> WaxyNode<'a> {
                     left: None,
                     right: None,
                 })};
+                target = Some(new_node);
             }
         }
         todo!()
