@@ -12,31 +12,37 @@ struct Node<'a> {
     right: Option<Rc<Node<'a>>>,
 }
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+struct WaxyNode<'a> {
+    node: Rc<Node<'a>>,
+}
+
 // Implementation for a leaf node.
-impl<'a> Node<'a> {
-    fn new() -> Self {
+impl<'a> WaxyNode<'a> {
+    fn new() -> WaxyNode<'a> {
         Self {
-            bits: Default::default(),
-            text: Default::default(),
-            left: None,
-            right: None,
+            node: Rc::new(Node {
+                bits: Default::default(),
+                text: Default::default(),
+                left: None,
+                right: None,
+            }),
         }
     }
     // Inserts a new leaf node in the correct branch
-    fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>)  {
-        if self.text == text {
+    fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) {
+        if self.node.text == text {
             return;
         }
 
-        let mut target = if text < self.text {
-            self.left
+        let mut target = if text < self.node.text {
+            self.node.left
         } else {
-            self.right
+            self.node.right
         };
 
         match target {
-            Some(subnode) => subnode.insert(bits, text)
-            ,
+            Some(subnode) => subnode.insert(bits, text),
             None => {
                 let new_node = Rc::new(Node {
                     bits,
@@ -70,7 +76,7 @@ mod test {
         #[test]
         fn t_1_node() {
             let got = Node::new().insert(vec![true].into(), "wow".into());
-            let expected= Node {
+            let expected = Node {
                 bits: Rc::new(vec![]),
                 text: Rc::new(""),
                 left: None,
