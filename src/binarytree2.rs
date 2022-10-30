@@ -7,8 +7,8 @@ type Bits = Vec<bool>;
 struct Node<'a> {
     bits: Rc<Bits>,
     text: Rc<&'a str>,
-    left: Option<WaxyNode<'a>>,
-    right: Option<WaxyNode<'a>>,
+    left: Option<Rc<WaxyNode<'a>>>,
+    right: Option<Rc<WaxyNode<'a>>>,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
@@ -28,31 +28,32 @@ impl<'a> WaxyNode<'a> {
             }),
         }
     }
+
     // Inserts a new leaf node in the correct branch
     fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) {
-        if self.node.as_ref().text == text {
+        if self.node.text == text {
             return;
         }
 
-        // FIX: Move out of an Rc error: https://stackoverflow.com/questions/72498867/cannot-move-out-of-an-rc-error-while-making-a-singly-linked-stack
-        let mut branch: Option<WaxyNode> = if text < self.node.as_ref().text {
-            self.node.left //can't consume RefCell, you have to return it!
+        // No longer relevant: Move out of an Rc error: https://stackoverflow.com/questions/72498867/cannot-move-out-of-an-rc-error-while-making-a-singly-linked-stack
+        let mut branch: Option<Rc<WaxyNode>> = if text < self.node.text {
+            self.node.left
         } else {
-            self.node.right //can't consume RefCell, you have to return it!
-
+            self.node.right
         };
 
         match branch {
-            Some(subnode) => subnode.insert(bits, text),
+            Some(sub_node) => sub_node.insert(bits, text),
+
             None => {
-                let new_node: WaxyNode = WaxyNode {
+                let new_node: Rc<WaxyNode> = Rc::new(WaxyNode {
                     node: Rc::new(Node {
                         bits,
                         text,
                         left: None,
                         right: None,
                     }),
-                };
+                });
                 branch = Some(new_node);
             }
         }
