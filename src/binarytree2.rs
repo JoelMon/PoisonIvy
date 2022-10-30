@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::ops::Deref;
 use std::rc::Rc;
 
 type Bits = Vec<bool>;
@@ -7,57 +8,48 @@ type Bits = Vec<bool>;
 struct Node<'a> {
     bits: Rc<Bits>,
     text: Rc<&'a str>,
-    left: Option<Rc<WaxyNode<'a>>>,
-    right: Option<Rc<WaxyNode<'a>>>,
-}
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-struct WaxyNode<'a> {
-    node: Rc<Node<'a>>,
+    left: Option<Rc<Node<'a>>>,
+    right: Option<Rc<Node<'a>>>,
 }
 
 // Implementation for a leaf node.
-impl<'a> WaxyNode<'a> {
-    fn new() -> WaxyNode<'a> {
+impl<'a> Node<'a> {
+    fn new() -> Node<'a> {
         Self {
-            node: Rc::new(Node {
-                bits: Default::default(),
-                text: Default::default(),
-                left: None,
-                right: None,
-            }),
+            bits: Default::default(),
+            text: Default::default(),
+            left: None,
+            right: None,
         }
     }
 
     // Inserts a new leaf node in the correct branch
     fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) {
-        if self.node.text == text {
+        if self.text == text {
             return;
         }
 
         // No longer relevant: Move out of an Rc error: https://stackoverflow.com/questions/72498867/cannot-move-out-of-an-rc-error-while-making-a-singly-linked-stack
-        let mut branch: Option<Rc<WaxyNode>> = if text < self.node.text {
-            self.node.left
+        let mut branch: Option<Rc<Node>> = if text < self.text {
+            self.left
         } else {
-            self.node.right
+            self.right
         };
 
         match branch {
-            Some(sub_node) => sub_node.insert(bits, text),
+            Some(sub_node) => self.insert(bits, text),
 
             None => {
-                let new_node: Rc<WaxyNode> = Rc::new(WaxyNode {
-                    node: Rc::new(Node {
-                        bits,
-                        text,
-                        left: None,
-                        right: None,
-                    }),
-                });
-                branch = Some(new_node);
+                let new_node = Node {
+                    bits,
+                    text,
+                    left: None,
+                    right: None,
+                };
+
+                branch = Some(Rc::new(new_node));
             }
         }
-        todo!()
     }
 }
 
