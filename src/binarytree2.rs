@@ -1,10 +1,9 @@
 use std::fmt::Debug;
-use std::ops::Deref;
 use std::rc::Rc;
 
 type Bits = Vec<bool>;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 struct Node<'a> {
     bits: Rc<Bits>,
     text: Rc<&'a str>,
@@ -12,9 +11,14 @@ struct Node<'a> {
     right: Option<Rc<Node<'a>>>,
 }
 
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+struct Tree<'a> {
+    root: Option<Rc<Node<'a>>>,
+}
+
 // Implementation for a leaf node.
 impl<'a> Node<'a> {
-    fn new() -> Node<'a> {
+    fn new() -> Self {
         Self {
             bits: Default::default(),
             text: Default::default(),
@@ -22,51 +26,70 @@ impl<'a> Node<'a> {
             right: None,
         }
     }
+}
+impl<'a> From<Node<'a>> for Option<Rc<Node<'a>>> {
+    fn from(node: Node<'a>) -> Self {
+        Some(Rc::new(node))
+    }
+}
 
-    // Inserts a new leaf node in the correct branch
-    fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) {
-        if self.text == text {
-            return;
+
+impl<'a> Tree<'a> {
+    fn new() -> Self {
+        Self {
+            root: Node::new().into(),
         }
+    }
+    // Inserts a new leaf node in the correct branch
+    fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) -> Self {
+        match self.root {
+            None => Tree::new().into(), // Return an new node if tree is empty
+            Some(tree) => {
 
-        // No longer relevant: Move out of an Rc error: https://stackoverflow.com/questions/72498867/cannot-move-out-of-an-rc-error-while-making-a-singly-linked-stack
-        let mut branch: Option<Rc<Node>> = if text < self.text {
-            self.left
-        } else {
-            self.right
-        };
 
-        match branch {
-            Some(sub_node) => self.insert(bits, text),
+                if  Rc::clone(&tree.text) < text {
+                    match tree.left {
+                        Some(_) => todo!(),
+                        None => Node::new().into(),
+                    }
 
-            None => {
-                let new_node = Node {
-                    bits,
-                    text,
-                    left: None,
-                    right: None,
                 };
-
-                branch = Some(Rc::new(new_node));
-            }
+                todo!()
+            },
         }
     }
 }
 
-// #[cfg(test)]
-// mod test {
-//     use super::*;
+#[cfg(test)]
+mod test {
+    use super::*;
 
-//     #[test]
-//     fn t_new_node() {
-//         let got = Node::new();
-//         let expect = Node {
-//             bits: Rc::new(vec![]),
-//             text: Rc::new(""),
-//             left: None,
-//             right: None,
-//         };
-//         assert_eq!(got, expect);
+    #[test]
+    fn t_new_node() {
+        let got = Node::new();
+        let expect = Node {
+            bits: Rc::new(vec![]),
+            text: Rc::new(""),
+            left: None,
+            right: None,
+        };
+        assert_eq!(got, expect);
+    }
+
+    #[test]
+    fn t_new_tree() {
+        let got = Tree::new();
+        let expect = Tree {
+            root: Some(Rc::new(Node {
+                bits: vec![].into(),
+                text: "".into(),
+                left: None,
+                right: None,
+            })),
+        };
+        assert_eq!(got, expect);
+    }
+}
 
 //         #[test]
 //         fn t_1_node() {
