@@ -1,6 +1,4 @@
-use std::cell::RefCell;
 use std::fmt::Debug;
-use std::ops::Deref;
 use std::rc::Rc;
 
 type Bits = Vec<bool>;
@@ -15,32 +13,32 @@ struct Node<'a> {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct WaxyNode<'a> {
-    node: Rc<RefCell<Node<'a>>>,
+    node: Rc<Node<'a>>,
 }
 
 // Implementation for a leaf node.
 impl<'a> WaxyNode<'a> {
     fn new() -> WaxyNode<'a> {
         Self {
-            node: Rc::new(RefCell::new(Node {
+            node: Rc::new(Node {
                 bits: Default::default(),
                 text: Default::default(),
                 left: None,
                 right: None,
-            })),
+            }),
         }
     }
     // Inserts a new leaf node in the correct branch
     fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) {
-        if self.node.as_ref().into_inner().text == text {
+        if self.node.as_ref().text == text {
             return;
         }
 
         // FIX: Move out of an Rc error: https://stackoverflow.com/questions/72498867/cannot-move-out-of-an-rc-error-while-making-a-singly-linked-stack
-        let mut branch: Option<WaxyNode> = if text < self.node.as_ref().into_inner().text {
-            self.node.as_ref().into_inner().left //can't consume RefCell, you have to return it!
+        let mut branch: Option<WaxyNode> = if text < self.node.as_ref().text {
+            self.node.left //can't consume RefCell, you have to return it!
         } else {
-            self.node.as_ref().into_inner().right //can't consume RefCell, you have to return it!
+            self.node.right //can't consume RefCell, you have to return it!
 
         };
 
@@ -48,12 +46,12 @@ impl<'a> WaxyNode<'a> {
             Some(subnode) => subnode.insert(bits, text),
             None => {
                 let new_node: WaxyNode = WaxyNode {
-                    node: Rc::new(RefCell::new(Node {
+                    node: Rc::new(Node {
                         bits,
                         text,
                         left: None,
                         right: None,
-                    })),
+                    }),
                 };
                 branch = Some(new_node);
             }
