@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 type Bits = Vec<bool>;
 
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 struct Node<'a> {
     bits: Rc<Bits>,
     text: Rc<&'a str>,
@@ -11,7 +11,7 @@ struct Node<'a> {
     right: Option<Rc<Node<'a>>>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 struct Tree<'a> {
     root: Option<Rc<Node<'a>>>,
 }
@@ -33,7 +33,6 @@ impl<'a> From<Node<'a>> for Option<Rc<Node<'a>>> {
     }
 }
 
-
 impl<'a> Tree<'a> {
     fn new() -> Self {
         Self {
@@ -41,23 +40,25 @@ impl<'a> Tree<'a> {
         }
     }
 
-
     // Inserts a new leaf node in the correct branch
     fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) -> Self {
+
+        // Recursive terminating statement needed here
+
         match self.root {
             None => Tree::new().into(), // Return an new node if tree is empty
-            Some(tree) => {
-
-
-                if  Rc::clone(&tree.text) < text {
-                    match tree.left {
+            Some(mut node) => {
+                if Rc::clone(&node.text) < text { // Iter over bits goes here
+                    // 
+                    match node.left {
                         Some(_) => todo!(),
-                        None => todo!(),
+                        None => Rc::make_mut(&mut node),
                     }
-
+                }else {
+                    todo!()
                 };
-                todo!()
-            },
+            todo!()
+            }
         }
     }
 }
