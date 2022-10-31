@@ -42,22 +42,24 @@ impl<'a> Tree<'a> {
 
     // Inserts a new leaf node in the correct branch
     fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) -> Self {
-
         // Recursive terminating statement needed here
 
         match self.root {
             None => Tree::new().into(), // Return an new node if tree is empty
             Some(mut node) => {
-                if Rc::clone(&node.text) < text { // Iter over bits goes here
-                    // 
+                // Iter over bits goes here
+                if Rc::clone(&node.text) <= text {
                     match node.left {
                         Some(_) => todo!(),
                         None => Rc::make_mut(&mut node),
                     }
-                }else {
-                    todo!()
+                } else {
+                    match node.right {
+                        Some(_) => todo!(),
+                        None => Rc::make_mut(&mut node),
+                    }
                 };
-            todo!()
+                todo!()
             }
         }
     }
@@ -87,6 +89,21 @@ mod test {
                 bits: vec![].into(),
                 text: "".into(),
                 left: None,
+                right: None,
+            })),
+        };
+        assert_eq!(got, expect);
+    }
+
+    #[test]
+    fn t_new_tree_left_insert() {
+        let got = Tree::new();
+        let got = got.insert(vec![false].into(), "".into());
+        let expect = Tree {
+            root: Some(Rc::new(Node {
+                bits: vec![].into(),
+                text: "".into(),
+                left: Node::new().into(),
                 right: None,
             })),
         };
