@@ -40,6 +40,8 @@ impl<'a> Tree<'a> {
             root: Node::new().into(),
         }
     }
+
+
     // Inserts a new leaf node in the correct branch
     fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) -> Self {
         match self.root {
@@ -50,7 +52,7 @@ impl<'a> Tree<'a> {
                 if  Rc::clone(&tree.text) < text {
                     match tree.left {
                         Some(_) => todo!(),
-                        None => Node::new().into(),
+                        None => todo!(),
                     }
 
                 };
