@@ -42,24 +42,32 @@ impl<'a> Tree<'a> {
 
     // Inserts a new leaf node in the correct branch
     fn insert(self, bits: Rc<Bits>, text: Rc<&'a str>) -> Self {
-        // Recursive terminating statement needed here
+        match self.root {
+            Some(ref node) => {
+                if &node.as_ref().text == &text{
+                    return self;
+                }},
+
+            None => todo!(),
+        }
 
         match self.root {
             None => Tree::new().into(), // Return an new node if tree is empty
-            Some(mut node) => {
+            Some(ref node) => {
                 // Iter over bits goes here
                 if Rc::clone(&node.text) <= text {
-                    match node.left {
+                    let new_tree = match node.left {
                         Some(_) => todo!(),
-                        None => Rc::make_mut(&mut node),
-                    }
+                        None => self.insert(bits, text),
+                    };
+                    new_tree
                 } else {
-                    match node.right {
+                    let new_tree = match node.right {
                         Some(_) => todo!(),
-                        None => Rc::make_mut(&mut node),
-                    }
-                };
-                todo!()
+                        None => self.insert(bits, text),
+                    };
+                    new_tree
+                }
             }
         }
     }
